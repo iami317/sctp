@@ -443,7 +443,7 @@ func (c *SCTPConn) Write(b []byte) (int, error) {
 }
 
 func (c *SCTPConn) Read(b []byte) (int, error) {
-	n, _, _, err := c.SCTPRead(b)
+	n, _, err := c.SCTPRead(b)
 	if n < 0 {
 		n = 0
 	}
@@ -720,7 +720,7 @@ func (c *SCTPSndRcvInfoWrappedConn) Read(b []byte) (int, error) {
 	if len(b) < int(sndRcvInfoSize) {
 		return 0, syscall.EINVAL
 	}
-	n, info, _, err := c.conn.SCTPRead(b[sndRcvInfoSize:])
+	n, info, err := c.conn.SCTPRead(b[sndRcvInfoSize:])
 	if err != nil {
 		return n, err
 	}
@@ -785,9 +785,11 @@ type SocketConfig struct {
 }
 
 func (cfg *SocketConfig) Listen(net string, laddr *SCTPAddr) (*SCTPListener, error) {
-	return listenSCTPExtConfig(net, laddr, cfg.InitMsg, cfg.RtoInfo, cfg.AssocInfo, cfg.Control)
+	//     listenSCTPExtConfig(network string, laddr *SCTPAddr, options InitMsg, control func(network, address string, c syscall.RawConn) error)
+	return listenSCTPExtConfig(net, laddr, cfg.InitMsg, cfg.Control)
 }
 
 func (cfg *SocketConfig) Dial(net string, laddr, raddr *SCTPAddr) (*SCTPConn, error) {
-	return dialSCTPExtConfig(net, laddr, raddr, cfg.InitMsg, cfg.RtoInfo, cfg.AssocInfo, cfg.Control)
+	//dialSCTPExtConfig(network string, laddr, raddr *SCTPAddr, options InitMsg, control func(network, address string, c syscall.RawConn) error)
+	return dialSCTPExtConfig(net, laddr, raddr, cfg.InitMsg, cfg.Control)
 }
